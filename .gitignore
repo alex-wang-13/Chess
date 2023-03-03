@@ -1,0 +1,4 @@
+# We can look up a standard Python gitignore later.
+
+# contains compiled bytecode -- don't push
+__pycache__/
