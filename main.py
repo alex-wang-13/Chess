@@ -6,16 +6,16 @@ Wang, Alex
 '''
 
 import chess
-import defis # TODO resolve this
+import defis
+import utils
 
 if __name__ == '__main__':
 
     player = True; # TODO player = 1 => white's turn; = 0 => black's turn
     board = chess.Board()
 
-    # TODO how do you access these functions defined in the definitions module? (see above in line 2)
-    # clear_terminal()
-    # explain_UCI()
+    utils.clear_terminal()
+    utils.explain_UCI()
 
     while 1:
         # try to play a move
@@ -24,7 +24,12 @@ if __name__ == '__main__':
         # TODO check for valid en passant + castling
         # TODO check if game is over (i.e. from repetition, 50-move, dead position, etc.)
         try:
-            test_move = chess.Move.from_uci(input())
-            board.push(test_move)
+            if player:  # if the player is playing
+                test_move = chess.Move.from_uci(input())
+                board.push(test_move)
+                player = 0
+            else:       # if the AI is playing
+                board.push(utils.AI_move(board))
+                player = 1
         except chess.InvalidMoveError:
             print('Invalid Move, Try Again')
