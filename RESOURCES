@@ -1,0 +1,21 @@
+RESOURCES and other useful links:
+
+Core Documentation for Chess Library:
+- https://python-chess.readthedocs.io/en/latest/core.html
+Overview of Chess Algorithms:
+- https://medium.com/@SereneBiologist/the-anatomy-of-a-chess-ai-2087d0d565
+- https://www.cs.cornell.edu/boom/2004sp/ProjectArch/Chess/algorithms.html
+Minimax:
+- https://en.wikipedia.org/wiki/Minimax
+Alpha-beta Pruning:
+- https://en.wikipedia.org/wiki/Minimax
+Opening Book:
+- https://www.chessprogramming.org/Opening_Book
+Endgame Tables:
+- https://www.chessprogramming.org/Endgame_Tablebases
+Explanation of FEN Notation (i.e. "rnbqkbnr/pppppppp/8/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq - 0 1")
+- https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation#Definition
+Explanation of UCI Notation (i.e. a2a4, a7a5, e2e4, b8c6, ...)
+- https://www.dcode.fr/uci-chess-notation
+Ways a Chess Game Can End:
+- https://en.wikipedia.org/wiki/Chess#End_of_the_game
