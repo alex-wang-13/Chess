@@ -9,13 +9,17 @@ import chess
 import defis
 import utils
 
+# START
 if __name__ == '__main__':
+
+    # Explaining the rules.
+    # useless: Todo but not urgent: fix this -> utils.clear_terminal()
+    utils.explain_UCI()
 
     player = True; # TODO player = 1 => white's turn; = 0 => black's turn
     board = chess.Board()
-
-    utils.clear_terminal()
-    utils.explain_UCI()
+    # print the board
+    print(board)
 
     while 1:
         # try to play a move
@@ -33,3 +37,16 @@ if __name__ == '__main__':
                 player = 1
         except chess.InvalidMoveError:
             print('Invalid Move, Try Again')
+
+        # print the board after the move
+        print(board)
+
+'''if 1:
+    board = chess.Board()
+    # print the board
+    print(board)
+
+    pawn_mask = board.pieces(chess.PAWN, chess.WHITE).mask
+    
+    # prints out a 64-bit representation of the positions of the white pawns
+    print(bin(pawn_mask)[2:].zfill(64))'''
