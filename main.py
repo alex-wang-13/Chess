@@ -10,16 +10,18 @@ import defis
 import utils
 
 # START
-if __name__ == '__main__':
+if 1: #__name__ == '__main__':
 
     # Explaining the rules.
     # useless: Todo but not urgent: fix this -> utils.clear_terminal()
     utils.explain_UCI()
 
-    player = True; # TODO player = 1 => white's turn; = 0 => black's turn
+    # TODO create functionality for AI to play as white
+    player = True # player = 1 => white's turn; = 0 => black's turn
     board = chess.Board()
     # print the board
     print(board)
+    print(defis.BOARD_BREAK)
 
     while 1:
         # try to play a move
@@ -29,19 +31,25 @@ if __name__ == '__main__':
         # TODO check if game is over (i.e. from repetition, 50-move, dead position, etc.)
         try:
             if player:  # if the player is playing
-                test_move = chess.Move.from_uci(input())
-                board.push(test_move)
+                move: chess.Move = utils.get_move()
+                board.push(move)
+                # alternate to the other player's turn
                 player = 0
             else:       # if the AI is playing
-                board.push(utils.AI_move(board))
+                # TODO remove this placeholder and add AI move
+                move = chess.Move.from_uci(input())
+                board.push(move)
+                # for later: board.push(utils.AI_move(board))
+                # alternate to the other player's turn
                 player = 1
         except chess.InvalidMoveError:
-            print('Invalid Move, Try Again')
+            print('Invalid Move, Try Again - Should Not Reach Here')
 
         # print the board after the move
         print(board)
+        print(defis.BOARD_BREAK)
 
-'''if 1:
+else:
     board = chess.Board()
     # print the board
     print(board)
@@ -49,4 +57,4 @@ if __name__ == '__main__':
     pawn_mask = board.pieces(chess.PAWN, chess.WHITE).mask
     
     # prints out a 64-bit representation of the positions of the white pawns
-    print(bin(pawn_mask)[2:].zfill(64))'''
+    print(bin(pawn_mask)[2:].zfill(64))
