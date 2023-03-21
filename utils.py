@@ -26,6 +26,24 @@ def explain_UCI() -> None:
 '''
 BOARD UTILS
 '''
+
+# TODO finish this validate move function and move to utils class
+def validate_move(board: chess.Board, move: chess.Move) -> chess.Move:
+    piece: chess.Piece = board.piece_at(move.from_square)
+    
+    match piece:
+        case chess.Piece.ROOK: 
+            print('hi')
+    
+    return move
+
+def get_move(board: chess.Board) -> chess.Move:
+    while 1:
+        test_move = chess.Move.from_uci(input())
+        move = validate_move(board, test_move)
+        if move != None:
+            return board.push(move)
+
 # checks if the game has ended in checkmate or stalemate
 def is_game_over(board: chess.Board = None) -> bool:
     assert board is not None
