@@ -8,6 +8,7 @@ Wang, Alex
 
 import chess
 import defis
+import math
 
 from os import system
 
@@ -41,7 +42,7 @@ class Node:
 
     def __init__(self, board: chess.Board):
         self.board: chess.Board = board
-        self.evaluation: int = static_eval(board)
+        self.evaluation: float = static_eval(board)
         self.children: list[Node] = []
 
     # adds a child Node to this Node
@@ -51,6 +52,10 @@ class Node:
     # checks if there are no children for this Node
     def is_terminal(self) -> bool:
         return self.children.__len__ == 0
+    
+    # gets the evaluation for this Node
+    def eval(self) -> float:
+        return self.evaluation
 
 # creates a Node based on a given board
 def create_node(board: chess.Board = None) -> Node:
@@ -65,8 +70,30 @@ def AI_move(board: chess.Board = None, depth: int = 5) -> Node:
     node = create_node(board)
     alphabeta()
 
-# TODO FINISH THIS FUNCTION
-def alphabeta(node, depth, α, β, maximizingPlayer) -> Node:
+# alpha-beta function (shamelessly stolen from wikipedia)
+# initial call: alphabeta(origin, depth, -inf, inf, True)
+def alphabeta(node, depth, a, b, maximizingPlayer) -> float:
     if depth == 0 or node.is_terminal():
-        return None # placeholder
-    return None # placeholder
+        return node.eval() # return the heuristic evaluation
+    if maximizingPlayer:
+        value = -math.inf
+        for child in node.children:
+            value = max(value, alphabeta(child, depth - 1, a, b, False))
+            if value > b:
+                break # beta cutoff
+            a = max(a, value)
+        return value
+    else:
+        value = math.inf
+        for child in node.children:
+            value = min(value, alphabeta(child, depth - 1, a, b, True))
+            if value < a:
+                break # alpha cutoff
+            b = min(b, value)
+        return value
+
+# TODO determine if fail-soft pruning is worth it
+def soft_alphabeta(node, depth, a, b, maximizingPlayer) -> int:
+    if depth == 0 or node.is_terminal():
+        return node.eval()
+    
