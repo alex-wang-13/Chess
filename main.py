@@ -10,7 +10,7 @@ import defis
 import utils
 
 # START
-if 1: #__name__ == '__main__':
+if 0: #__name__ == '__main__':
 
     # Explaining the rules.
     # useless: Todo but not urgent: fix this -> utils.clear_terminal()
@@ -25,7 +25,6 @@ if 1: #__name__ == '__main__':
 
     while 1:
         # try to play a move
-        # TODO add functionality to undo moves
         # TODO check if game is over (i.e. from repetition, 50-move, dead position, etc.)
         try:
             if player:  # if the player is playing
@@ -48,6 +47,9 @@ if 1: #__name__ == '__main__':
                 player = 1
         except chess.InvalidMoveError:
             print('Invalid Move, Try Again - Should Not Reach Here')
+        
+        # check if game is over
+        utils.check_result(board)
 
         # print the board after the move
         print(board)
@@ -56,31 +58,23 @@ if 1: #__name__ == '__main__':
 else:
     board = chess.Board()
     # print the board
-    board.push(chess.Move.from_uci("g1f3")) # first move
-    print(board.is_repetition())
-    board.push(chess.Move.from_uci("g8f6"))
-    print(board.is_repetition())
-    board.push(chess.Move.from_uci("f3g1"))
-    print(board.is_repetition())
-    board.push(chess.Move.from_uci("f6g8")) # first repetition
-    print(board.is_repetition())
-    board.push(chess.Move.from_uci("g1f3"))
-    print(board.is_repetition())
-    board.push(chess.Move.from_uci("g8f6"))
-    print(board.is_repetition())
-    board.push(chess.Move.from_uci("f3g1"))
-    print(board.is_repetition())
-    board.push(chess.Move.from_uci("f6g8")) # second repetition (third time this position occurred)
-    print(board.is_repetition())
-    print(board.is_stalemate())
-    board.push(chess.Move.from_uci("g1f3"))
-    print(board.is_repetition())
-    board.push(chess.Move.from_uci("g8f6"))
-    print(board.is_repetition())
-    board.push(chess.Move.from_uci("f3g1"))
-    print(board.is_repetition())
+    # board.push(chess.Move.from_uci("g1f3")) # first move
+    # board.push(chess.Move.from_uci("g8f6"))
+    # board.push(chess.Move.from_uci("f3g1"))
+    # board.push(chess.Move.from_uci("f6g8")) # first repetition
+    # board.push(chess.Move.from_uci("g1f3"))
+    # board.push(chess.Move.from_uci("g8f6"))
+    # board.push(chess.Move.from_uci("f3g1"))
+    # board.push(chess.Move.from_uci("f6g8")) # second repetition (third time this position occurred)
 
-    pawn_mask = board.pieces(chess.PAWN, chess.WHITE).mask
+    for x in range(2):
+        board.push(chess.Move.from_uci("g1f3")) # first move
+        board.push(chess.Move.from_uci("g8f6"))
+        board.push(chess.Move.from_uci("f3g1"))
+        board.push(chess.Move.from_uci("f6g8"))
+        utils.check_result(board)
+
+    # pawn_mask = board.pieces(chess.PAWN, chess.WHITE).mask
     
     # prints out a 64-bit representation of the positions of the white pawns
-    print(bin(pawn_mask)[2:].zfill(64))
+    # print(bin(pawn_mask)[2:].zfill(64))

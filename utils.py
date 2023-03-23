@@ -27,6 +27,18 @@ def explain_UCI() -> None:
 BOARD UTILS
 '''
 
+def check_result(board: chess.Board):
+    # prints out the current result of a board
+    result = 'in progress'
+    if board.is_repetition():
+        result = 'stalemate (repetition)'
+    if board.is_stalemate():
+        result = 'stalemate'
+    if board.is_checkmate():
+        result = 'checkmate'
+    if result != 'in progress':
+        print(f'The result is {result}.')
+
 def validate_move(board: chess.Board, move: chess.Move) -> chess.Move:
     #piece: chess.PieceType = board.piece_at(move.from_square).piece_type
     legal_moves = board.legal_moves
