@@ -17,7 +17,7 @@ if 1: #__name__ == '__main__':
     utils.explain_UCI()
 
     # TODO create functionality for AI to play as white
-    player = True # player = 1 => white's turn; = 0 => black's turn
+    player = 1 # player = 1 => white's turn; = 0 => black's turn
     board = chess.Board()
     # print the board
     print(board)
@@ -30,14 +30,20 @@ if 1: #__name__ == '__main__':
         try:
             if player:  # if the player is playing
                 move: chess.Move = utils.get_move(board)
-                board.push(move)
+                if move == 'undo':
+                    board.pop()
+                else:
+                    board.push(move)
                 # alternate to the other player's turn
                 player = 0
             else:       # if the AI is playing
                 # TODO remove this placeholder and add AI move
                 move: chess.Move = utils.get_move(board)
-                board.push(move)
-                # for later: board.push(utils.AI_move(board))
+                if move == 'undo':
+                    board.pop()
+                else:
+                    board.push(move)
+                    # for later: board.push(utils.AI_move(board))
                 # alternate to the other player's turn
                 player = 1
         except chess.InvalidMoveError:

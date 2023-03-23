@@ -38,10 +38,14 @@ def validate_move(board: chess.Board, move: chess.Move) -> chess.Move:
 
 def get_move(board: chess.Board) -> chess.Move:
     while 1:
-        test_move = chess.Move.from_uci(input())
-        move = validate_move(board, test_move)
-        if move != None:
-            return move
+        user_input = input()
+        if user_input == 'undo':
+            return user_input
+        else:
+            test_move = chess.Move.from_uci(user_input)
+            move = validate_move(board, test_move)
+            if move != None:
+                return move
 
 # checks if the game has ended in checkmate or stalemate
 def is_game_over(board: chess.Board = None) -> bool:
@@ -81,6 +85,7 @@ def create_node(board: chess.Board = None) -> Node:
 '''
 AI UTILS
 '''
+
 # stand-in for AI function (TODO)
 def AI_move(board: chess.Board = None, depth: int = 5) -> Node:
     assert board is not None
