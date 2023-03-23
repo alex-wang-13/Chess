@@ -32,6 +32,10 @@ def check_result(board: chess.Board):
     result = 'in progress'
     if board.is_repetition():
         result = 'stalemate (repetition)'
+    if board.is_fifty_moves():
+        result = 'stalemate (fifty moves)'
+    if board.is_insufficient_material():
+        result = 'stalemate (insufficient material)'
     if board.is_stalemate():
         result = 'stalemate'
     if board.is_checkmate():
