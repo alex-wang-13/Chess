@@ -7,6 +7,7 @@ Wang, Alex
 '''
 
 import chess
+import chess.engine
 import defis
 import math
 
@@ -21,7 +22,7 @@ def clear_terminal() -> None:
 
 # gives an explanation of UCI notation to terminal
 def explain_UCI() -> None:
-    print(defis.UCI_EXPLANATION)
+    print(f"{defis.UCI_EXPLANATION}\n")
 
 '''
 BOARD UTILS
@@ -52,7 +53,7 @@ def validate_move(board: chess.Board, move: chess.Move) -> chess.Move:
     # if the provided move is not a legal move
     return None
 
-def get_move(board: chess.Board) -> chess.Move:
+def get_player_move(board: chess.Board) -> chess.Move:
     while 1:
         user_input = input()
         if user_input == 'undo':
@@ -102,11 +103,59 @@ def create_node(board: chess.Board = None) -> Node:
 AI UTILS
 '''
 
+# evaluates a board position
+async def evaluate(board: chess.Board, engine: chess.engine.UciProtocol) -> float:
+    # get evaluation from engine
+    info = await engine.analyse(board, chess.engine.Limit(time=0.1, depth=20))
+
+    return info["score"]
+
+
 # stand-in for AI function (TODO)
-def AI_move(board: chess.Board = None, depth: int = 5) -> Node:
+async def get_AI_move(board: chess.Board, engine: chess.engine) -> Node:
     assert board is not None
-    node = create_node(board)
-    alphabeta()
+    result = await engine.play(board, chess.engine.Limit(time=3))
+    return result.move
+    # evaluation = alphabeta(node, 5, -math.inf, math.inf, True)
+
+
+async def play_game(player_is_white: bool):
+    
+    # Initialize the game variables.
+    playerTurn = player_is_white
+    board = chess.Board()
+    _, engine = await chess.engine.popen_uci(defis.STOCKFISH)
+    depth = 20
+
+    # Print initial board state.
+    explain_UCI()
+    print(f"{board}\n")
+
+    # Start game loop.
+    if playerTurn:
+        # Get the player's move. Note: 'undo' returns to the player's last move.
+        move = get_player_move()
+        if move == "undo":
+            # Undo last player and AI move.
+            board.pop()
+            board.pop()
+        else:
+            # Push the move and toggle playerTurn.
+            board.push(move)
+            playerTurn = not playerTurn
+    else:
+        # Get the AI's move and push it.
+        board.push(get_AI_move(board, engine, depth))
+        playerTurn = not playerTurn
+        
+
+
+
+
+
+
+
+
 
 # alpha-beta function (shamelessly stolen from wikipedia)
 # initial call: alphabeta(origin, depth, -inf, inf, True)
