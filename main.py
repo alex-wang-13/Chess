@@ -5,12 +5,83 @@ Ghosh, Trisha
 Wang, Alex
 '''
 
+import asyncio
 import chess
+import chess.engine
 import defis
-import utils
+import utils    
+
+async def get_AI_move(board):
+    transport, engine = await chess.engine.popen_uci(defis.STOCKFISH)
+
+    result = await engine.play(board, chess.engine.Limit(time=3))
+    board.push(result.move)
+
+# asyncio.set_event_loop_policy(chess.engine.EventLoopPolicy())
+# asyncio.run(evaluate(board))
+
+if __name__ == "__main__":
+    arg = "-"
+    player_is_white = None
+
+    # Choose play mode.
+    while arg not in ["b", "w", "a"]:
+        arg = input("Play as black or white? (b/w) ")
+        if arg == "w":
+            player_is_white = True
+        elif arg == "b":
+            player_is_white = False
+        if arg not in ["b", "w", "a"]:
+            print(f"Enter b or w. You entered {arg}.")
+    
+    # Play the game.
+    asyncio.set_event_loop_policy(chess.engine.EventLoopPolicy())
+    
+    # Initialize the game variables.
+    player_turn = player_is_white
+    board = chess.Board()
+
+    # Print initial board state.
+    utils.explain_UCI()
+    print(f"{board}\n\n----------------\n")
+
+    # Start game loop.
+    while not board.is_game_over():
+        if player_turn:
+            # Get the player's move. Note: 'undo' returns to the player's last move.
+            print("Play move...\n")
+            move = utils.get_player_move(board)
+            if move == "undo":
+                # Undo last player and AI move.
+                board.pop()
+                board.pop()
+                print(f"{board}\n")
+            else:
+                # Push the move and toggle player_turn.
+                try:
+                    board.push(move)
+                    player_turn = not player_turn
+                    print(f"{board}\n")
+                except chess.InvalidMoveError:
+                    print("Invalid Move, Try Again - Should Not Reach Here")
+        else:
+            print("AI is thinking...\n")
+            # Get the AI's move and push it.
+            asyncio.set_event_loop_policy(chess.engine.EventLoopPolicy())
+            asyncio.run(get_AI_move(board))
+            player_turn = not player_turn
+            print(f"{board}\n")
+            print("AI played move...\n")
+    
+    # Game Over. Print result.
+    utils.check_result(board)
+
+
+
+
 
 # START
-if 0: #__name__ == '__main__':
+if 0:
 
     # Explaining the rules.
     # useless: Todo but not urgent: fix this -> utils.clear_terminal()
@@ -25,24 +96,25 @@ if 0: #__name__ == '__main__':
 
     while 1:
         # try to play a move
-        # TODO check if game is over (i.e. from repetition, 50-move, dead position, etc.)
         try:
             if player:  # if the player is playing
-                move: chess.Move = utils.get_move(board)
+                move: chess.Move = utils.get_player_move(board)
                 if move == 'undo':
                     board.pop()
                 else:
                     board.push(move)
-                # alternate to the other player's turn
-                player = 0
-            else:       # if the AI is playing
-                # TODO remove this placeholder and add AI move
-                move: chess.Move = utils.get_move(board)
+                    # alternate to the other player's turn
+                    player = 0
+            else:
+                # if the AI is playing
+                move: chess.Move = utils.get_AI_move(board)
+                board.push(move)
+                '''
                 if move == 'undo':
                     board.pop()
                 else:
                     board.push(move)
-                    # for later: board.push(utils.AI_move(board))
+                '''
                 # alternate to the other player's turn
                 player = 1
         except chess.InvalidMoveError:
@@ -55,8 +127,10 @@ if 0: #__name__ == '__main__':
         print(board)
         print(defis.BOARD_BREAK)
 
-else:
+elif 0:
     board = chess.Board()
+
+    
     # print the board
     # board.push(chess.Move.from_uci("g1f3")) # first move
     # board.push(chess.Move.from_uci("g8f6"))
@@ -67,12 +141,12 @@ else:
     # board.push(chess.Move.from_uci("f3g1"))
     # board.push(chess.Move.from_uci("f6g8")) # second repetition (third time this position occurred)
 
-    for x in range(2):
-        board.push(chess.Move.from_uci("g1f3")) # first move
-        board.push(chess.Move.from_uci("g8f6"))
-        board.push(chess.Move.from_uci("f3g1"))
-        board.push(chess.Move.from_uci("f6g8"))
-        utils.check_result(board)
+    # for x in range(30):
+    #     board.push(chess.Move.from_uci("g1f3")) # first move
+    #     board.push(chess.Move.from_uci("g8f6"))
+    #     board.push(chess.Move.from_uci("f3g1"))
+    #     board.push(chess.Move.from_uci("f6g8"))
+    #     utils.check_result(board)
 
     # pawn_mask = board.pieces(chess.PAWN, chess.WHITE).mask
     
