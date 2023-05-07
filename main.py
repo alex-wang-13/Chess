@@ -15,6 +15,7 @@ async def get_AI_move(board):
     transport, engine = await chess.engine.popen_uci(defis.STOCKFISH)
 
     result = await engine.play(board, chess.engine.Limit(time=3))
+    # print(format(board.knights, "064b"))
     board.push(result.move)
 
 # asyncio.set_event_loop_policy(chess.engine.EventLoopPolicy())
@@ -67,8 +68,9 @@ if __name__ == "__main__":
         else:
             print("AI is thinking...\n")
             # Get the AI's move and push it.
-            asyncio.set_event_loop_policy(chess.engine.EventLoopPolicy())
-            asyncio.run(get_AI_move(board))
+            # asyncio.set_event_loop_policy(chess.engine.EventLoopPolicy()) (stockfish code)
+            # asyncio.run(get_AI_move(board))
+            utils.play_move(board)
             player_turn = not player_turn
             print(f"{board}\n")
             print("AI played move...\n")
@@ -106,15 +108,11 @@ if 0:
                     # alternate to the other player's turn
                     player = 0
             else:
-                # if the AI is playing
-                move: chess.Move = utils.get_AI_move(board)
-                board.push(move)
-                '''
+                move: chess.Move = utils.get_player_move(board)
                 if move == 'undo':
                     board.pop()
                 else:
-                    board.push(move)
-                '''
+                    board.push(move)                
                 # alternate to the other player's turn
                 player = 1
         except chess.InvalidMoveError:

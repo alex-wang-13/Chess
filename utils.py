@@ -6,12 +6,15 @@ Ghosh, Trisha
 Wang, Alex
 '''
 
+import asyncio
 import chess
 import chess.engine
 import defis
 import math
 
 from os import system
+
+simple_engine = chess.engine.SimpleEngine.popen_uci(defis.STOCKFISH)
 
 '''
 I/O UTILS
@@ -75,41 +78,24 @@ def static_eval(board: chess.Board) -> float:
     eval: float = 0
     return (eval + 1) if (board.turn == chess.WHITE) else (eval - 1)
 
-# represents a node on the minimax search tree
-class Node:
-
-    def __init__(self, board: chess.Board):
-        self.board: chess.Board = board
-        self.evaluation: float = static_eval(board)
-        self.children: list[Node] = []
-
-    # adds a child Node to this Node
-    def add_child(self, child_node) -> None:
-        self.children.append(child_node)
-    
-    # checks if there are no children for this Node
-    def is_terminal(self) -> bool:
-        return self.children.__len__ == 0
-    
-    # gets the evaluation for this Node
-    def eval(self) -> float:
-        return self.evaluation
-
-# creates a Node based on a given board
-def create_node(board: chess.Board = None) -> Node:
-    return Node(board)
 
 '''
 AI UTILS
 '''
 
 # evaluates a board position
-async def evaluate(board: chess.Board, engine: chess.engine.UciProtocol) -> float:
+async def evaluate(board: chess.Board) -> float:
     # get evaluation from engine
+    transport, engine = await chess.engine.popen_uci(defis.STOCKFISH)
     info = await engine.analyse(board, chess.engine.Limit(time=0.1, depth=20))
 
-    return info["score"]
+    # return evaluation
+    return info["score"].relative.score()
 
+def simple_eval(board: chess.Board):
+    info = simple_engine.analyse(board, chess.engine.Limit(time=0.1, depth=20))
+    # return evaluation
+    return info["score"].relative.score()
 
 # stand-in for AI function (TODO)
 async def get_AI_move(board: chess.Board, engine: chess.engine) -> Node:
@@ -119,68 +105,59 @@ async def get_AI_move(board: chess.Board, engine: chess.engine) -> Node:
     # evaluation = alphabeta(node, 5, -math.inf, math.inf, True)
 
 
-async def play_game(player_is_white: bool):
-    
-    # Initialize the game variables.
-    playerTurn = player_is_white
-    board = chess.Board()
-    _, engine = await chess.engine.popen_uci(defis.STOCKFISH)
-    depth = 20
+def play_move(board: chess.Board):
 
-    # Print initial board state.
-    explain_UCI()
-    print(f"{board}\n")
+    # perform minimax
+    result = ultra_alphabeta(board, 3, -math.inf, math.inf, board.turn == chess.WHITE)
+    board.push(result)
 
-    # Start game loop.
-    if playerTurn:
-        # Get the player's move. Note: 'undo' returns to the player's last move.
-        move = get_player_move()
-        if move == "undo":
-            # Undo last player and AI move.
-            board.pop()
-            board.pop()
-        else:
-            # Push the move and toggle playerTurn.
+def ultra_alphabeta(board: chess.Board, depth, alpha, beta, maximizing_player):
+    if depth == 0:
+        return simple_eval(board) # TODO redo this evaluation function based on heuristics
+
+    if maximizing_player:
+        max_eval = float('-inf')
+        for move in board.legal_moves:
             board.push(move)
-            playerTurn = not playerTurn
+            eval = ultra_alphabeta(board, depth-1, alpha, beta, False)
+            board.pop()
+            max_eval = max(max_eval, eval)
+            alpha = max(alpha, eval)
+            if beta <= alpha:
+                break
+        return max_eval
+
     else:
-        # Get the AI's move and push it.
-        board.push(get_AI_move(board, engine, depth))
-        playerTurn = not playerTurn
-        
+        min_eval = float('inf')
+        for move in board.legal_moves:
+            board.push(move)
+            eval = ultra_alphabeta(board, depth-1, alpha, beta, True)
+            board.pop()
+            min_eval = min(min_eval, eval)
+            beta = min(beta, eval)
+            if beta <= alpha:
+                break
+        return min_eval
 
-
-
-
-
-
-
-
-
-# alpha-beta function (shamelessly stolen from wikipedia)
-# initial call: alphabeta(origin, depth, -inf, inf, True)
-def alphabeta(node, depth, a, b, maximizingPlayer) -> float:
-    if depth == 0 or node.is_terminal():
-        return node.eval() # return the heuristic evaluation
+def wack_alphabeta(node: chess.Board, depth, a, b, maximizingPlayer) -> float:
+    print ("run")
+    print(type(node))
+    if depth == 0 or node.legal_moves.count() == 0:
+        asyncio.set_event_loop_policy(chess.engine.EventLoopPolicy())
+        return asyncio.run(evaluate(node))
     if maximizingPlayer:
         value = -math.inf
-        for child in node.children:
-            value = max(value, alphabeta(child, depth - 1, a, b, False))
+        for child in node.legal_moves:
+            value = max(value, wack_alphabeta(node.push(child), depth - 1, a, b, False))
             if value > b:
                 break # beta cutoff
             a = max(a, value)
         return value
     else:
         value = math.inf
-        for child in node.children:
-            value = min(value, alphabeta(child, depth - 1, a, b, True))
+        for child in node.legal_moves:
+            value = min(value, wack_alphabeta(node.push(child), depth - 1, a, b, True))
             if value < a:
                 break # alpha cutoff
             b = min(b, value)
         return value
-
-# TODO determine if fail-soft pruning is worth it
-def soft_alphabeta(node, depth, a, b, maximizingPlayer) -> int:
-    if depth == 0 or node.is_terminal():
-        return node.eval()
-    
