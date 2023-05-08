@@ -1,7 +1,6 @@
 '''
 This is a definitions module.
 Authors: 
-Ghosh, Trisha
 Wang, Alex
 '''
 

@@ -2,7 +2,6 @@
 This is a board utility module.
 Contains the AI functionality for the bot.
 Authors:
-Ghosh, Trisha
 Wang, Alex
 '''
 

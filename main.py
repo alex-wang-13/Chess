@@ -1,7 +1,6 @@
 '''
 This is a chess program.
 Authors: 
-Ghosh, Trisha
 Wang, Alex
 '''
 
