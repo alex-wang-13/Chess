@@ -10,6 +10,7 @@ import chess.engine
 import defis
 import utils    
 
+# This fucntion is to run Stockfish.
 async def get_AI_move(board):
     transport, engine = await chess.engine.popen_uci(defis.STOCKFISH)
 
@@ -17,8 +18,6 @@ async def get_AI_move(board):
     # print(format(board.knights, "064b"))
     board.push(result.move)
 
-# asyncio.set_event_loop_policy(chess.engine.EventLoopPolicy())
-# asyncio.run(evaluate(board))
 
 if __name__ == "__main__":
     arg = "-"
@@ -76,76 +75,3 @@ if __name__ == "__main__":
     
     # Game Over. Print result.
     utils.check_result(board)
-
-
-
-
-
-# START
-if 0:
-
-    # Explaining the rules.
-    # useless: Todo but not urgent: fix this -> utils.clear_terminal()
-    utils.explain_UCI()
-
-    # TODO create functionality for AI to play as white
-    player = 1 # player = 1 => white's turn; = 0 => black's turn
-    board = chess.Board()
-    # print the board
-    print(board)
-    print(defis.BOARD_BREAK)
-
-    while 1:
-        # try to play a move
-        try:
-            if player:  # if the player is playing
-                move: chess.Move = utils.get_player_move(board)
-                if move == 'undo':
-                    board.pop()
-                else:
-                    board.push(move)
-                    # alternate to the other player's turn
-                    player = 0
-            else:
-                move: chess.Move = utils.get_player_move(board)
-                if move == 'undo':
-                    board.pop()
-                else:
-                    board.push(move)                
-                # alternate to the other player's turn
-                player = 1
-        except chess.InvalidMoveError:
-            print('Invalid Move, Try Again - Should Not Reach Here')
-        
-        # check if game is over
-        utils.check_result(board)
-
-        # print the board after the move
-        print(board)
-        print(defis.BOARD_BREAK)
-
-elif 0:
-    board = chess.Board()
-
-    
-    # print the board
-    # board.push(chess.Move.from_uci("g1f3")) # first move
-    # board.push(chess.Move.from_uci("g8f6"))
-    # board.push(chess.Move.from_uci("f3g1"))
-    # board.push(chess.Move.from_uci("f6g8")) # first repetition
-    # board.push(chess.Move.from_uci("g1f3"))
-    # board.push(chess.Move.from_uci("g8f6"))
-    # board.push(chess.Move.from_uci("f3g1"))
-    # board.push(chess.Move.from_uci("f6g8")) # second repetition (third time this position occurred)
-
-    # for x in range(30):
-    #     board.push(chess.Move.from_uci("g1f3")) # first move
-    #     board.push(chess.Move.from_uci("g8f6"))
-    #     board.push(chess.Move.from_uci("f3g1"))
-    #     board.push(chess.Move.from_uci("f6g8"))
-    #     utils.check_result(board)
-
-    # pawn_mask = board.pieces(chess.PAWN, chess.WHITE).mask
-    
-    # prints out a 64-bit representation of the positions of the white pawns
-    # print(bin(pawn_mask)[2:].zfill(64))

@@ -66,46 +66,16 @@ def get_player_move(board: chess.Board) -> chess.Move:
             if move != None:
                 return move
 
-# checks if the game has ended in checkmate or stalemate
-def is_game_over(board: chess.Board = None) -> bool:
-    assert board is not None
-    return board.is_checkmate() or board.is_stalemate()
-
-# TODO make BASIC evaluation function
-# TODO (later) make evaluation function better
-def static_eval(board: chess.Board) -> float:
-    eval: float = 0
-    return (eval + 1) if (board.turn == chess.WHITE) else (eval - 1)
-
-
 '''
 AI UTILS
 '''
-
-# evaluates a board position
-async def evaluate(board: chess.Board) -> float:
-    # get evaluation from engine
-    transport, engine = await chess.engine.popen_uci(defis.STOCKFISH)
-    info = await engine.analyse(board, chess.engine.Limit(time=0.1, depth=20))
-
-    # return evaluation
-    return info["score"].relative.score()
 
 def simple_eval(board: chess.Board):
     info = simple_engine.analyse(board, chess.engine.Limit(time=0.1, depth=20))
     # return evaluation
     return info["score"].relative.score()
 
-# stand-in for AI function (TODO)
-async def get_AI_move(board: chess.Board, engine: chess.engine) -> Node:
-    assert board is not None
-    result = await engine.play(board, chess.engine.Limit(time=3))
-    return result.move
-    # evaluation = alphabeta(node, 5, -math.inf, math.inf, True)
-
-
 def play_move(board: chess.Board):
-
     # perform minimax
     result = ultra_alphabeta(board, 3, -math.inf, math.inf, board.turn == chess.WHITE)
     board.push(result)
@@ -137,26 +107,3 @@ def ultra_alphabeta(board: chess.Board, depth, alpha, beta, maximizing_player):
             if beta <= alpha:
                 break
         return min_eval
-
-def wack_alphabeta(node: chess.Board, depth, a, b, maximizingPlayer) -> float:
-    print ("run")
-    print(type(node))
-    if depth == 0 or node.legal_moves.count() == 0:
-        asyncio.set_event_loop_policy(chess.engine.EventLoopPolicy())
-        return asyncio.run(evaluate(node))
-    if maximizingPlayer:
-        value = -math.inf
-        for child in node.legal_moves:
-            value = max(value, wack_alphabeta(node.push(child), depth - 1, a, b, False))
-            if value > b:
-                break # beta cutoff
-            a = max(a, value)
-        return value
-    else:
-        value = math.inf
-        for child in node.legal_moves:
-            value = min(value, wack_alphabeta(node.push(child), depth - 1, a, b, True))
-            if value < a:
-                break # alpha cutoff
-            b = min(b, value)
-        return value
