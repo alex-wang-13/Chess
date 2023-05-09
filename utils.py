@@ -41,26 +41,21 @@ def check_result(board: chess.Board):
     if result != 'in progress':
         print(f'The result is {result}.')
 
-''' Checks that a current move is valid. '''
-def validate_move(board: chess.Board, move: chess.Move) -> chess.Move:
-    legal_moves = board.legal_moves
-    for legal_move in legal_moves:
-        if legal_move == move:
-            return move
-    # if the provided move is not a legal move
-    return None
-
 ''' Prompts the user to type a move. A valid move is in UCI notation. '''
 def get_player_move(board: chess.Board) -> chess.Move:
     while 1:
-        user_input = input()
-        if user_input == 'undo':
-            return user_input
+        test_move = input()
+        if test_move == 'undo':
+            return test_move
         else:
-            test_move = chess.Move.from_uci(user_input)
-            move = validate_move(board, test_move)
-            if move != None:
-                return move
+            try:
+                test_move = chess.Move.from_uci(test_move)
+                if test_move not in board.legal_moves:
+                    raise chess.InvalidMoveError
+                return test_move
+            except chess.InvalidMoveError:
+                print(f"'{test_move}' is an invalid move\n")
+                continue
 
 '''
 AI UTILS
