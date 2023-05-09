@@ -13,16 +13,11 @@ import sys
 
 from os import system
 
-simple_engine = chess.engine.SimpleEngine.popen_uci(defis.STOCKFISH)
-
 '''
 I/O UTILS
 '''
-# clears the terminal
-def clear_terminal() -> None:
-    system(defis.CLEAR_TERMINAL)
 
-# gives an explanation of UCI notation to terminal
+''' Prints an explanation of UCI notation. '''
 def explain_UCI() -> None:
     print(f"{defis.UCI_EXPLANATION}\n")
 
@@ -30,8 +25,8 @@ def explain_UCI() -> None:
 BOARD UTILS
 '''
 
+''' Prints the result of the current board. '''
 def check_result(board: chess.Board):
-    # prints out the current result of a board
     result = 'in progress'
     if board.is_repetition():
         result = 'stalemate (repetition)'
@@ -46,8 +41,8 @@ def check_result(board: chess.Board):
     if result != 'in progress':
         print(f'The result is {result}.')
 
+''' Checks that a current move is valid. '''
 def validate_move(board: chess.Board, move: chess.Move) -> chess.Move:
-    #piece: chess.PieceType = board.piece_at(move.from_square).piece_type
     legal_moves = board.legal_moves
     for legal_move in legal_moves:
         if legal_move == move:
@@ -55,6 +50,7 @@ def validate_move(board: chess.Board, move: chess.Move) -> chess.Move:
     # if the provided move is not a legal move
     return None
 
+''' Prompts the user to type a move. A valid move is in UCI notation. '''
 def get_player_move(board: chess.Board) -> chess.Move:
     while 1:
         user_input = input()
@@ -70,7 +66,7 @@ def get_player_move(board: chess.Board) -> chess.Move:
 AI UTILS
 '''
 
-# Simple evaluation based on the number of pieces of the relevant color
+''' Simple evaluation based on the number of pieces of the relevant color. '''
 def simple_eval(board: chess.Board) -> int:
     board: chess.Board = chess.Board()
     color: chess.Color = board.turn
@@ -86,6 +82,7 @@ def simple_eval(board: chess.Board) -> int:
     # return score and modify based on player color
     return score if color else -score
 
+''' Prompts the AI to play a move. '''
 def play_move(board: chess.Board):
     # perform minimax on each of the possible moves
     results = {}
@@ -96,6 +93,7 @@ def play_move(board: chess.Board):
     optimal = max(results, key=results.get) if board.turn else min(results, key=results.get)
     board.push(optimal)
 
+''' Simple alpha-beta pruning function taken from Wikipedia. '''
 def ultra_alphabeta(board: chess.Board, depth, alpha, beta, maximizing_player):
     if depth == 0 or board.is_game_over():
         return simple_eval(board) # TODO improve this static eval funtcion
