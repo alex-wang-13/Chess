@@ -66,7 +66,7 @@ def get_player_move(board: chess.Board) -> chess.Move:
 AI UTILS
 '''
 
-''' Simple evaluation based on the number of pieces of the relevant color. '''
+''' Simple evaluation based on the weighted sum of pieces. '''
 def simple_eval(board: chess.Board) -> int:
     board: chess.Board = chess.Board()
     color: chess.Color = board.turn
@@ -74,16 +74,17 @@ def simple_eval(board: chess.Board) -> int:
     
     # add pieces
     score += str(board.pieces(chess.PAWN, color)).count("1")
-    score += str(board.pieces(chess.ROOK, color)).count("1")
-    score += str(board.pieces(chess.KNIGHT, color)).count("1")
-    score += str(board.pieces(chess.BISHOP, color)).count("1")
-    score += str(board.pieces(chess.QUEEN, color)).count("1")
+    score += str(board.pieces(chess.ROOK, color)).count("1") * 5
+    score += str(board.pieces(chess.KNIGHT, color)).count("1") * 3
+    score += str(board.pieces(chess.BISHOP, color)).count("1") * 3
+    score += str(board.pieces(chess.QUEEN, color)).count("1") * 9
+    score += str(board.pieces(chess.KING, color)).count("1") * 999
 
     # return score and modify based on player color
     return score if color else -score
 
 ''' Prompts the AI to play a move. '''
-def play_move(board: chess.Board):
+def AI_play_move(board: chess.Board):
     # perform minimax on each of the possible moves
     results = {}
     for move in board.legal_moves:
