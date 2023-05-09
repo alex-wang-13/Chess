@@ -4,37 +4,24 @@ Authors:
 Wang, Alex
 '''
 
-import asyncio
 import chess
 import chess.engine
-import defis
-import utils    
+import utils
 
-# This fucntion is to run Stockfish.
-async def get_AI_move(board):
-    transport, engine = await chess.engine.popen_uci(defis.STOCKFISH)
-
-    result = await engine.play(board, chess.engine.Limit(time=3))
-    # print(format(board.knights, "064b"))
-    board.push(result.move)
-
-
+''' This is a bad chess game. '''
 if __name__ == "__main__":
     arg = "-"
     player_is_white = None
 
     # Choose play mode.
-    while arg not in ["b", "w", "a"]:
+    while arg not in ["b", "w"]:
         arg = input("Play as black or white? (b/w) ")
         if arg == "w":
             player_is_white = True
         elif arg == "b":
             player_is_white = False
-        if arg not in ["b", "w", "a"]:
+        if arg not in ["b", "w"]:
             print(f"Enter b or w. You entered {arg}.")
-    
-    # Play the game.
-    asyncio.set_event_loop_policy(chess.engine.EventLoopPolicy())
     
     # Initialize the game variables.
     player_turn = player_is_white
@@ -66,8 +53,6 @@ if __name__ == "__main__":
         else:
             print("AI is thinking...\n")
             # Get the AI's move and push it.
-            # asyncio.set_event_loop_policy(chess.engine.EventLoopPolicy()) (stockfish code)
-            # asyncio.run(get_AI_move(board))
             utils.play_move(board)
             player_turn = not player_turn
             print(f"{board}\n")
