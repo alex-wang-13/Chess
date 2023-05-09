@@ -5,11 +5,11 @@ Authors:
 Wang, Alex
 '''
 
-import asyncio
 import chess
 import chess.engine
 import defis
 import math
+import sys
 
 from os import system
 
@@ -70,25 +70,41 @@ def get_player_move(board: chess.Board) -> chess.Move:
 AI UTILS
 '''
 
-def simple_eval(board: chess.Board):
-    info = simple_engine.analyse(board, chess.engine.Limit(time=0.1, depth=20))
-    # return evaluation
-    return info["score"].relative.score()
+# Simple evaluation based on the number of pieces of the relevant color
+def simple_eval(board: chess.Board) -> int:
+    board: chess.Board = chess.Board()
+    color: chess.Color = board.turn
+    score: int = 0
+    
+    # add pieces
+    score += str(board.pieces(chess.PAWN, color)).count("1")
+    score += str(board.pieces(chess.ROOK, color)).count("1")
+    score += str(board.pieces(chess.KNIGHT, color)).count("1")
+    score += str(board.pieces(chess.BISHOP, color)).count("1")
+    score += str(board.pieces(chess.QUEEN, color)).count("1")
+
+    # return score and modify based on player color
+    return score if color else -score
 
 def play_move(board: chess.Board):
-    # perform minimax
-    result = ultra_alphabeta(board, 3, -math.inf, math.inf, board.turn == chess.WHITE)
-    board.push(result)
+    # perform minimax on each of the possible moves
+    results = {}
+    for move in board.legal_moves:
+        results.update({move: ultra_alphabeta(board, 3, -math.inf, math.inf, board.turn == chess.WHITE)})
+    
+    # get the best move for the given color
+    optimal = max(results, key=results.get) if board.turn else min(results, key=results.get)
+    board.push(optimal)
 
 def ultra_alphabeta(board: chess.Board, depth, alpha, beta, maximizing_player):
-    if depth == 0:
-        return simple_eval(board) # TODO redo this evaluation function based on heuristics
+    if depth == 0 or board.is_game_over():
+        return simple_eval(board) # TODO improve this static eval funtcion
 
     if maximizing_player:
-        max_eval = float('-inf')
+        max_eval = -sys.maxsize
         for move in board.legal_moves:
             board.push(move)
-            eval = ultra_alphabeta(board, depth-1, alpha, beta, False)
+            eval = ultra_alphabeta(board, depth-1, alpha, beta, chess.BLACK)
             board.pop()
             max_eval = max(max_eval, eval)
             alpha = max(alpha, eval)
@@ -97,10 +113,10 @@ def ultra_alphabeta(board: chess.Board, depth, alpha, beta, maximizing_player):
         return max_eval
 
     else:
-        min_eval = float('inf')
+        min_eval = sys.maxsize
         for move in board.legal_moves:
             board.push(move)
-            eval = ultra_alphabeta(board, depth-1, alpha, beta, True)
+            eval = ultra_alphabeta(board, depth-1, alpha, beta, chess.WHITE)
             board.pop()
             min_eval = min(min_eval, eval)
             beta = min(beta, eval)
