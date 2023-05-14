@@ -58,7 +58,6 @@ if __name__ == "__main__":
             # Get the AI's move and push it.
             utils.AI_play_move(board)
             player_turn = not player_turn
-#            print("AI played move...\n")
             print(f"{board.peek()}")
             print(f"{board}\n\n----------------\n")
     
