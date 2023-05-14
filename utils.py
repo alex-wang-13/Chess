@@ -55,7 +55,6 @@ def get_player_move(board: chess.Board) -> chess.Move:
                 return test_move
             except chess.InvalidMoveError:
                 print(f"'{test_move}' is an invalid move\n")
-                continue
 
 '''
 AI UTILS
@@ -63,30 +62,46 @@ AI UTILS
 
 ''' Simple evaluation based on the weighted sum of pieces. '''
 def simple_eval(board: chess.Board) -> int:
-    board: chess.Board = chess.Board()
+    # board: chess.Board = chess.Board()
     color: chess.Color = board.turn
-    score: int = 0
+    material_score: float = 0
+    mobility_score: float = 0
     
-    # add pieces
-    score += str(board.pieces(chess.PAWN, color)).count("1")
-    score += str(board.pieces(chess.ROOK, color)).count("1") * 5
-    score += str(board.pieces(chess.KNIGHT, color)).count("1") * 3
-    score += str(board.pieces(chess.BISHOP, color)).count("1") * 3
-    score += str(board.pieces(chess.QUEEN, color)).count("1") * 9
-    score += str(board.pieces(chess.KING, color)).count("1") * 999
+    # calculate the value of the pieces
+    material_score += defis.PAWN_WT * (len(board.pieces(chess.PAWN, chess.WHITE)) - len(board.pieces(chess.PAWN, chess.BLACK)))
+    material_score += defis.ROOK_WT * (len(board.pieces(chess.ROOK, chess.WHITE)) - len(board.pieces(chess.ROOK, chess.BLACK)))
+    material_score += defis.KNIGHT_WT * (len(board.pieces(chess.KNIGHT, chess.WHITE)) - len(board.pieces(chess.KNIGHT, chess.BLACK)))
+    material_score += defis.BISHOP_WT * (len(board.pieces(chess.BISHOP, chess.WHITE)) - len(board.pieces(chess.BISHOP, chess.BLACK)))
+    material_score += defis.QUEEN_WT * (len(board.pieces(chess.QUEEN, chess.WHITE)) - len(board.pieces(chess.QUEEN, chess.BLACK)))
+    material_score += defis.KING_WT * (len(board.pieces(chess.KING, chess.WHITE)) - len(board.pieces(chess.KING, chess.BLACK)))
 
-    # return score and modify based on player color
-    return score if color else -score
+    # calculate the mobility score TODO add the isolated + doubled pawns
+    board.turn = chess.WHITE
+    white_mobility = board.legal_moves.count()
+    board.turn = chess.BLACK
+    black_mobility = board.legal_moves.count()
+    mobility_score += defis.MOBILITY_WT * (white_mobility - black_mobility)
+
+    # aggregate the two scores
+    score = (material_score + mobility_score)
+
+    return score
+
+# h = chess.Board("r1b1kbnr/p1pp1ppp/8/4p3/2B1P3/5Q2/PPPP1PPP/RNB1K1NR w KQkq - 2 4")
+# f = simple_eval(h)
+# print(f)
+# print(h)
 
 ''' Prompts the AI to play a move. '''
 def AI_play_move(board: chess.Board):
     # perform minimax on each of the possible moves
     results = {}
     for move in board.legal_moves:
-        results.update({move: ultra_alphabeta(board, 3, -math.inf, math.inf, board.turn == chess.WHITE)})
+        results.update({move: ultra_alphabeta(board, 4, -math.inf, math.inf, board.turn == chess.WHITE)})
     
     # get the best move for the given color
     optimal = max(results, key=results.get) if board.turn else min(results, key=results.get)
+    print(f"{results}, {optimal}")
     board.push(optimal)
 
 ''' Simple alpha-beta pruning function taken from Wikipedia. '''
